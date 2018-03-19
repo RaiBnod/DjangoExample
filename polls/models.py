@@ -1,17 +1,19 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
+import datetime
 
-# Create your models here.
 
 class Question(models.Model):
-    question_text = models.CharField(_('Question ho bhai'), max_length=200)
+    question_text = models.CharField(_('Modified Question Text'), max_length=200)
     pub_date = models.DateTimeField('date published')
 
     def __str__(self):
         return self.question_text
 
-    def when_published(self):
-        return self.pub_date
+    def was_published_recently(self):
+        return timezone.now() - datetime.timedelta(days=1) <= self.pub_date <= timezone.now()
+
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
@@ -20,4 +22,3 @@ class Choice(models.Model):
 
     def __str__(self):
         return self.choice_text
-
