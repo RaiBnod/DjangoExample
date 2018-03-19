@@ -1,0 +1,7 @@
+venv/
+db.sqlite3
+coverage
+.idea
+.git
+*.pyc
+*./migrations/
