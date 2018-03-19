@@ -4,4 +4,4 @@ coverage
 .idea
 .git
 *.pyc
-*./migrations/
+*/migrations/*

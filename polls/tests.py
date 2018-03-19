@@ -1,5 +1,6 @@
 import datetime
 
+from django.http import HttpResponseNotFound
 from django.test import TestCase
 # Create your tests here.
 from django.utils import timezone
@@ -45,6 +46,8 @@ class QuestionModelTests(TestCase):
         question = Question(pub_date=time)
         self.assertIs(question.was_published_recently(), True)
 
+
+class QuestionListViewTest(TestCase):
     def test_no_question(self):
         """
         If no questions exist, an appropriate message is displayed.
@@ -92,3 +95,24 @@ class QuestionModelTests(TestCase):
         response = self.client.get(reverse('polls:index'))
         self.assertQuerysetEqual(response.context['latest_question_list'],
                                  ['<Question: Past Question 2>', '<Question: Past Question 1>'])
+
+
+class QuestionDetailViewTest(TestCase):
+    def test_future_question(self):
+        """
+        The detail view of a question with a pub_date in the future
+        returns a 404 not found.
+        """
+        future_question = create_question('Future Question', days=20)
+        url = reverse('polls:detail', args=(future_question.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
+
+    def test_pass_question(self):
+        """
+        The detail view of a question with a pub_date in the past
+        displays the question's text.
+        """
+        past_question = create_question('Past Question', days=-20)
+        response = self.client.get(reverse('polls:detail', args=(past_question.id,)))
+        self.assertContains(response, past_question.question_text)
